@@ -105,6 +105,11 @@ class ShipStationWeight(ShipStationBase):
         self.value = value
 
 
+class ShipStationAdvancedOptions(ShipStationBase):
+    def __init__(self, custom_field1=None):
+        self.custom_field1 = custom_field1
+
+
 class ShipStationContainer(ShipStationBase):
     def __init__(self, units=None, length=None, width=None, height=None):
         self.units = units
@@ -314,6 +319,18 @@ class ShipStationOrder(ShipStationBase):
 
         return dict(units="ounces", value=round(weight, 2))
 
+    def set_advanced_options(self, advanced_options):
+        if type(advanced_options) is not ShipStationAdvancedOptions:
+            raise AttributeError("Should be type ShipStationAdvancedOptions")
+
+        self.advanced_options = advanced_options
+
+    def get_advanced_options(self):
+        if self.advanced_options:
+            return self.advanced_options.as_dict()
+        else:
+            return None
+
     def add_item(self, item):
         """
         Adds a new item to the order with all of the required keys.
@@ -348,6 +365,7 @@ class ShipStationOrder(ShipStationBase):
         d["shipTo"] = self.get_shipping_address_as_dict()
         d["weight"] = self.get_weight()
         d["internationalOptions"] = self.get_international_options_as_dict()
+        d["advancedOptions"] = self.get_advanced_options()
 
         return d
 
@@ -509,3 +527,7 @@ class ShipStation(ShipStationBase):
             endpoint='/products'
         )
 
+    def fetch_warehouses(self):
+        return self.get(
+            endpoint='/warehouses'
+        )
