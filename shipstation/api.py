@@ -106,8 +106,10 @@ class ShipStationWeight(ShipStationBase):
 
 
 class ShipStationAdvancedOptions(ShipStationBase):
-    def __init__(self, custom_field1=None):
+    def __init__(self, custom_field1=None, source=None, store_id=None):
         self.custom_field1 = custom_field1
+        self.source = source
+        self.store_id = store_id
 
 
 class ShipStationContainer(ShipStationBase):
@@ -530,4 +532,9 @@ class ShipStation(ShipStationBase):
     def fetch_warehouses(self):
         return self.get(
             endpoint='/warehouses'
+        )
+
+    def fetch_stores(self):
+        return self.get(
+            endpoint='/stores'
         )
