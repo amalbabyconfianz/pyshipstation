@@ -397,6 +397,14 @@ class ShipStation(ShipStationBase):
         "page_size",
     )
 
+    FULFILLMENT_LIST_PARAMETERS = (
+        "order_id",
+    )
+
+    SHIPMENT_LIST_PARAMETERS = (
+        "order_id",
+    )
+
     def __init__(self, key=None, secret=None, debug=False):
         """
         Connecting to ShipStation required an account and a
@@ -509,9 +517,43 @@ class ShipStation(ShipStationBase):
             endpoint='/orders/' + order_id
         )
 
-    def fetch_shipments(self):
+    def fetch_shipments(self, parameters={}):
+        """
+            Query, fetch, and return existing orders from ShipStation
+
+            Args:
+                parameters (dict): Dict of filters to filter by.
+
+            Raises:
+                AttributeError: parameters not of type dict
+                AttributeError: invalid key in parameters dict.
+
+            Returns:
+                A <Response [code]> object.
+
+            Examples:
+                >>> ss.fetch_shipments(parameters={'order_status': 'shipped', 'page': '2'})
+        """
+
+        if not isinstance(parameters, dict):
+            raise AttributeError("`parameters` must be of type dict")
+
+        invalid_keys = set(parameters.keys()).difference(
+            self.SHIPMENT_LIST_PARAMETERS)
+
+        if invalid_keys:
+            raise AttributeError(
+                "Invalid order list parameters: {}".format(
+                    ", ".join(invalid_keys))
+            )
+
+        valid_parameters = {
+            self.to_camel_case(key): value for key, value in parameters.items()
+        }
+
         return self.get(
-            endpoint='/shipments'
+            endpoint='/shipments',
+            payload=valid_parameters
         )
 
     def delete_order(self, order_id):
@@ -519,9 +561,43 @@ class ShipStation(ShipStationBase):
             endpoint='/orders/' + order_id
         )
 
-    def fetch_fulfillments(self):
+    def fetch_fulfillments(self, parameters={}):
+        """
+            Query, fetch, and return existing orders from ShipStation
+
+            Args:
+                parameters (dict): Dict of filters to filter by.
+
+            Raises:
+                AttributeError: parameters not of type dict
+                AttributeError: invalid key in parameters dict.
+
+            Returns:
+                A <Response [code]> object.
+
+            Examples:
+                >>> ss.fetch_fulfillments(parameters={'order_status': 'shipped', 'page': '2'})
+        """
+
+        if not isinstance(parameters, dict):
+            raise AttributeError("`parameters` must be of type dict")
+
+        invalid_keys = set(parameters.keys()).difference(
+            self.FULFILLMENT_LIST_PARAMETERS)
+
+        if invalid_keys:
+            raise AttributeError(
+                "Invalid order list parameters: {}".format(
+                    ", ".join(invalid_keys))
+            )
+
+        valid_parameters = {
+            self.to_camel_case(key): value for key, value in parameters.items()
+        }
+
         return self.get(
-            endpoint='/fulfillments'
+            endpoint='/fulfillments',
+            payload=valid_parameters
         )
 
     def fetch_products(self):
